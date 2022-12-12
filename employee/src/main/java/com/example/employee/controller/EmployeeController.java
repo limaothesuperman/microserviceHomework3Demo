@@ -1,6 +1,7 @@
 package com.example.employee.controller;
 
 import com.example.employee.service.EmployeeService;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,13 @@ public class EmployeeController {
     }
 
     @GetMapping("/employees")
+    @HystrixCommand(fallbackMethod = "getDefault", commandKey = "getDefault")
     public ResponseEntity<?> getAllEmp(@RequestParam int age) {
         return new ResponseEntity<>(employeeService.fetchEmpAgeLargerThan(age), HttpStatus.OK);
     }
+
+    public ResponseEntity<?> getDefault(@RequestParam int age) {
+        return new ResponseEntity<>(age, HttpStatus.OK);
+    }
+
 }
